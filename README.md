@@ -10,14 +10,16 @@ A high-concurrency, multithreaded forward proxy server engineered in modern C++ 
 
 ## Architecture Overview
 
+## Architecture Overview
+
 ```mermaid
 flowchart TD
-    Client["Client / Browser"] -->|1. HTTP / CONNECT Request| Listener["Socket Listener (Port 8888)"]
-    Listener -->|2. accept()| Pool["Win32 Thread Pool"]
-    Pool -->|3. Parse Host & Port| Policy{"Policy Engine<br/>O(1) Hash Set"}
+    Client["Client / Browser"] -->|"1. HTTP / CONNECT Request"| Listener["Socket Listener (Port 8888)"]
+    Listener -->|"2. accept connection"| Pool["Win32 Thread Pool"]
+    Pool -->|"3. Parse Host & Port"| Policy{"Policy Engine<br/>O(1) Hash Set"}
 
     Policy -->|Matched Blocklist| Block["Drop Connection<br/>Inject 403 Forbidden"]
-    Block -->|403 Response| Client
+    Block -->|"403 Response"| Client
 
     Policy -->|Allowed| Routing{"HTTP Method?"}
 
@@ -28,6 +30,7 @@ flowchart TD
     Tunnel <-->|Bidirectional Encrypted Stream| Client
     Tunnel <-->|Raw TLS Handshake & Traffic| Remote["Origin Web Server (Port 443)"]
     Forward <-->|Fetch Resource| Remote
+```
 
 Key Technical Features
 1. Multi-Threaded Concurrency Model
